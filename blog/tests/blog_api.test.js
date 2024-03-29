@@ -101,6 +101,77 @@ test('blog without author is not added', async () => {
   assert.strictEqual(blogsAfter.length, initialBlogs.length)
 })
 
+test('update blog when all is sent', async () => {
+  const blogs = await blogsInDb()
+  const blogToUpdate = blogs[0]
+
+  const newData = {
+    title: 'Title updated',
+    author: 'Author updated',
+    url: 'https://newurl.com',
+    likes: 25
+  }
+
+  const updatedBlogResponse = await api
+    .put(`/api/blogs/${blogToUpdate.id}`)
+    .send(newData)
+    .expect(200)
+
+  const updatedBlog = updatedBlogResponse.body
+
+  assert.strictEqual(updatedBlog.title, newData.title)
+  assert.strictEqual(updatedBlog.author, newData.author)
+  assert.strictEqual(updatedBlog.url, newData.url)
+  assert.strictEqual(updatedBlog.likes, newData.likes)
+})
+
+test('update blog when only title is sent', async () => {
+  const blogs = await blogsInDb()
+  const blogToUpdate = blogs[0]
+
+  const newData = {
+    title: 'Title updated',
+  }
+
+  const updatedBlogResponse = await api
+    .put(`/api/blogs/${blogToUpdate.id}`)
+    .send(newData)
+    .expect(200)
+
+  const updatedBlog = updatedBlogResponse.body
+
+  assert.strictEqual(updatedBlog.title, newData.title)
+})
+
+test('update blog when nothing is sent', async () => {
+  const blogs = await blogsInDb()
+  const blogToUpdate = blogs[0]
+
+  const newData = {
+
+  }
+
+  await api
+    .put(`/api/blogs/${blogToUpdate.id}`)
+    .send(newData)
+    .expect(200)
+})
+
+test('update blog when different data is sent', async () => {
+  const blogs = await blogsInDb()
+  const blogToUpdate = blogs[0]
+
+  const newData = {
+    age: 52,
+    phoneNumber: '+1 203-4095-394'
+  }
+
+  const updatedBlog = await api
+    .put(`/api/blogs/${blogToUpdate.id}`)
+    .send(newData)
+    .expect(200)
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
